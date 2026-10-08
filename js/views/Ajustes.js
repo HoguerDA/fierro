@@ -1,0 +1,71 @@
+import { html, useState } from '../vendor/preact-htm.js';
+import { useStore, actions, toast, navigate } from '../state.js';
+import { Card, Btn, Num, Segment, Confirm } from './ui.js';
+import { toUnit, fromUnit, n1 } from '../util.js';
+import { SEQUENCE, SESSIONS } from '../data/routine.js';
+import { APP_VERSION } from '../version.js';
+
+export function Ajustes() {
+  const s = useStore();
+  const st = s.settings;
+  const unit = st.unidad;
+  const [confirm, setConfirm] = useState(null);
+  const save = (patch) => actions.saveSettings(patch);
+
+  async function onImport(e) {
+    const f = e.target.files && e.target.files[0]; if (!f) return;
+    try { await actions.importJSON(await f.text()); toast('Respaldo cargado'); } catch (err) { toast(err.message); }
+    e.target.value = '';
+  }
+
+  return html`<div class="page">
+    <header class="page-h"><h1>Ajustes</h1><${Btn} kind="ghost" small onClick=${() => navigate('hoy')}>Cerrar</${Btn}></header>
+
+    <${Card} title="Tú">
+      <div class="field"><label>Nombre</label><input class="text" value=${st.nombre} onInput=${(e) => save({ nombre: e.target.value })} /></div>
+      <div class="field"><label>Fecha de nacimiento</label><input class="text" type="date" value=${st.nacimiento || ''} onChange=${(e) => save({ nacimiento: e.target.value || null })} /></div>
+      <div class="field"><label>Estatura</label><${Num} value=${st.estatura} onChange=${(v) => save({ estatura: v })} suffix="cm" inputMode="numeric" /></div>
+      <div class="field"><label>Peso meta (opcional)</label><${Num} value=${st.metaPeso || null} onChange=${(v) => save({ metaPeso: v })} suffix="kg" /></div>
+    </${Card}>
+
+    <${Card} title="Cargas del gym">
+      <div class="field"><label>Unidad de las pesas</label><${Segment} options=${[['kg', 'kg'], ['lb', 'lb']]} value=${unit} onChange=${(u) => save({ unidad: u })} /></div>
+      <div class="muted small">El peso corporal siempre va en kg. Esto solo cambia cómo capturas las pesas del gym; por dentro todo se guarda en kg.</div>
+    </${Card}>
+
+    <${Card} title="Pesos iniciales">
+      <p class="muted small">Lo que cargas hoy en cada ejercicio, en ${unit}. Es el punto de partida de la primera sesión; después la app lo lleva sola. Déjalo vacío si no lo sabes.</p>
+      ${SEQUENCE.map((id) => html`<h3>${SESSIONS[id].nombre}</h3>
+        ${SESSIONS[id].ejercicios.map((e) => html`<div class="field row between"><label>${e.nombre}</label>
+          <${Num} class="w90" value=${s.startingWeights[e.id] == null ? null : Math.round(toUnit(s.startingWeights[e.id], unit) * 100) / 100} onChange=${(v) => actions.setStartingWeight(e.id, v == null ? null : fromUnit(v, unit))} placeholder="—" />
+        </div>`)}`)}
+    </${Card}>
+
+    <${Card} title="Dieta: parámetros">
+      <div class="field"><label>Factor de actividad</label><${Num} value=${st.factor} onChange=${(v) => save({ factor: v || 1.55 })} step=${0.05} /></div>
+      <div class="field"><label>Déficit (0.20 = 20 %)</label><${Num} value=${st.deficit} onChange=${(v) => save({ deficit: v == null ? 0.2 : v })} step=${0.05} /></div>
+      <div class="field"><label>Proteína g/kg</label><${Num} value=${st.proteinaGkg} onChange=${(v) => save({ proteinaGkg: v || 2 })} step=${0.1} /></div>
+      <div class="field"><label>Grasa g/kg</label><${Num} value=${st.grasaGkg} onChange=${(v) => save({ grasaGkg: v || 0.8 })} step=${0.1} /></div>
+      <div class="muted small">Déficit 0 = semana de mantenimiento. Pon 0 cada 8 a 10 semanas, una semana, y regresa a 0.20.</div>
+    </${Card}>
+
+    <${Card} title="Plan de entrenamiento">
+      <div class="muted small">Bloque ${s.plan.blockNumber}, ${s.plan.blockSessions} sesiones hechas en este bloque de 20.</div>
+      <${Btn} kind="ghost" small onClick=${() => setConfirm('plan')}>Reiniciar bloque y secuencia</${Btn}>
+    </${Card}>
+
+    <${Card} title="Tus datos">
+      <p class="muted small">Todo vive en este teléfono. Haz un respaldo cada tanto; las fotos no van en el respaldo.</p>
+      <div class="row gap">
+        <${Btn} kind="ghost" small onClick=${() => actions.exportJSON()}>Exportar respaldo</${Btn}>
+        <label class="btn btn-ghost btn-sm file-btn">Importar<input type="file" accept="application/json" onChange=${onImport} /></label>
+      </div>
+      <${Btn} kind="danger" small onClick=${() => setConfirm('todo')}>Borrar todo</${Btn}>
+    </${Card}>
+
+    <div class="muted small center">Fierro ${APP_VERSION}${s.updateReady ? html` · <a href="#" onClick=${(e) => { e.preventDefault(); location.reload(); }}>Hay versión nueva, toca para actualizar</a>` : ''}</div>
+
+    <${Confirm} open=${confirm === 'plan'} text="Vuelves al bloque 1, semana 1, Superior A. El historial de sesiones se conserva." onYes=${() => { actions.resetPlan(); setConfirm(null); toast('Plan reiniciado'); }} onNo=${() => setConfirm(null)} yes="Reiniciar" />
+    <${Confirm} open=${confirm === 'todo'} text="Se borra TODO: pesajes, fotos, sesiones y ajustes. No hay vuelta atrás. ¿Seguro?" onYes=${async () => { await actions.resetAll(); setConfirm(null); navigate('hoy'); }} onNo=${() => setConfirm(null)} yes="Borrar todo" />
+  </div>`;
+}
