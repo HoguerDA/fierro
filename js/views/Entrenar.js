@@ -6,8 +6,20 @@ import { summary, nextSessionTemplate, currentWeek, isDeload } from '../engine/p
 
 export function Entrenar() {
   const s = useStore();
-  if (!s.active) return html`<${SinSesion} s=${s} />`;
-  return html`<${Sesion} s=${s} />`;
+  const [done, setDone] = useState(null);
+  const unit = s.settings.unidad;
+  // El resumen vive aquí, no en Sesion: al terminar, state.active se vacía y Sesion se desmonta.
+  return html`
+    ${s.active ? html`<${Sesion} s=${s} onDone=${setDone} />` : html`<${SinSesion} s=${s} />`}
+    <${Sheet} open=${!!done} onClose=${() => { setDone(null); navigate('hoy'); }} title="Sesión terminada">
+      ${done ? html`<div class="stats">
+        <${Stat} label="series" value=${done.series} />
+        <${Stat} label="tonelaje" value=${n0(toUnit(done.tonelaje, unit))} sub=${unit} />
+        <${Stat} label="minutos" value=${done.min != null ? done.min : '–'} />
+      </div>
+      ${done.prs.length ? html`<div class="banner ok">Récord estimado en: ${done.prs.join(', ')}</div>` : html`<div class="muted small">Siguiente: ${nextSessionTemplate(s.plan).nombre}.</div>`}
+      <${Btn} onClick=${() => { setDone(null); navigate('hoy'); }}>Listo</${Btn}>` : null}
+    </${Sheet}>`;
 }
 
 function SinSesion({ s }) {
@@ -36,7 +48,7 @@ function resumenCorto(x) {
   return `${n} series${min ? ` · ${min} min` : ''}`;
 }
 
-function Sesion({ s }) {
+function Sesion({ s, onDone }) {
   const a = s.active;
   const unit = s.settings.unidad;
   const [rest, setRest] = useState(null); // {end, total}
@@ -45,7 +57,6 @@ function Sesion({ s }) {
   const [sub, setSub] = useState(null);
   const [confirmEnd, setConfirmEnd] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
-  const [done, setDone] = useState(null);
   const fired = useRef(false);
 
   useInterval(() => setNow(Date.now()), 1000, true);
@@ -86,9 +97,9 @@ function Sesion({ s }) {
 
   async function finish() {
     setConfirmEnd(false);
-    const sess = await actions.finishSession();
-    setDone(summary(sess, s.sessions));
     setRest(null);
+    const sess = await actions.finishSession();
+    onDone(summary(sess, s.sessions));
   }
 
   const restLeft = rest ? Math.round((rest.end - now) / 1000) : null;
@@ -155,15 +166,5 @@ function Sesion({ s }) {
 
     <${Confirm} open=${confirmEnd} text=${doneSets < totalSets ? `Llevas ${doneSets} de ${totalSets} series. ¿Terminar de todos modos?` : '¿Terminar la sesión?'} onYes=${finish} onNo=${() => setConfirmEnd(false)} yes="Terminar" no="Seguir" />
     <${Confirm} open=${confirmCancel} text="Se borra lo registrado hoy y la sesión vuelve a quedar pendiente. ¿Cancelar?" onYes=${() => { setConfirmCancel(false); actions.cancelSession(); setRest(null); navigate('hoy'); }} onNo=${() => setConfirmCancel(false)} yes="Sí, cancelar" no="No" />
-
-    <${Sheet} open=${!!done} onClose=${() => { setDone(null); navigate('hoy'); }} title="Sesión terminada">
-      ${done ? html`<div class="stats">
-        <${Stat} label="series" value=${done.series} />
-        <${Stat} label="tonelaje" value=${n0(toUnit(done.tonelaje, unit))} sub=${unit} />
-        <${Stat} label="minutos" value=${done.min != null ? done.min : '–'} />
-      </div>
-      ${done.prs.length ? html`<div class="banner ok">Récord estimado en: ${done.prs.join(', ')}</div>` : null}
-      <${Btn} onClick=${() => { setDone(null); navigate('hoy'); }}>Listo</${Btn}>` : null}
-    </${Sheet}>
   </div>`;
 }

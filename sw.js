@@ -1,5 +1,5 @@
 // Fierro service worker. Sube VERSION en cada despliegue (deploy.py lo hace solo).
-const VERSION = '0.1.0';
+const VERSION = '0.1.1';
 const CACHE = 'fierro-' + VERSION;
 const SHELL = [
   './', './index.html', './styles.css', './manifest.webmanifest',
