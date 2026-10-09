@@ -80,9 +80,9 @@ function WeightChart({ weighins }) {
     for (let k = lo; k <= hi; k += (hi - lo > 8 ? 2 : 1)) { g.beginPath(); g.moveTo(pad.l, y(k)); g.lineTo(W - pad.r, y(k)); g.stroke(); g.fillText(String(k), pad.l - 6, y(k) + 4); }
     g.textAlign = 'center';
     for (let i = 0; i < 60; i += 15) { const d = addDays(start, i); g.fillText(fmtDate(d, false), x(d), H - 6); }
-    g.fillStyle = 'rgba(255,122,26,.55)';
+    g.fillStyle = css.getPropertyValue('--graf-punto');
     for (const p of pts) { g.beginPath(); g.arc(x(p.fecha), y(p.kg), 3, 0, Math.PI * 2); g.fill(); }
-    g.strokeStyle = '#ff7a1a'; g.lineWidth = 2.5; g.beginPath();
+    g.strokeStyle = css.getPropertyValue('--graf-acc'); g.lineWidth = 2.5; g.beginPath();
     avg.forEach((a, i) => { i ? g.lineTo(x(a.d), y(a.kg)) : g.moveTo(x(a.d), y(a.kg)); }); g.stroke();
   }, [weighins, state.settings.tema]);
   return html`<canvas ref=${ref} class="chart"></canvas>`;
