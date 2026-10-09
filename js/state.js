@@ -15,6 +15,7 @@ export const DEFAULT_SETTINGS = {
   proteinaGkg: 2.0,
   grasaGkg: 0.8,
   fotosBorrosas: false, // fotos de progreso desenfocadas (botón del ojo)
+  tema: 'oscuro',       // 'oscuro' | 'claro'
   onboarded: false,
 };
 
@@ -48,6 +49,15 @@ export async function snapshot() {
   return data;
 }
 
+// Pone la vista clara u oscura. La copia en localStorage la lee index.html antes de pintar.
+export function aplicarTema(tema) {
+  const claro = tema === 'claro';
+  if (claro) document.documentElement.dataset.tema = 'claro'; else delete document.documentElement.dataset.tema;
+  const m = document.querySelector('meta[name="theme-color"]');
+  if (m) m.setAttribute('content', claro ? '#f2f2f2' : '#141414');
+  try { localStorage.setItem('fierro.tema', claro ? 'claro' : 'oscuro'); } catch (_) { /* sin almacenamiento */ }
+}
+
 export function useStore() {
   const [, set] = useState(0);
   // useLayoutEffect: se suscribe en el mismo render, así no se pierde un aviso que llegue justo después de montar.
@@ -61,6 +71,7 @@ export async function load() {
     db.all('sessions'), db.all('weighins'), db.all('meals'), db.keys('photos'), db.get('kv', 'active'),
   ]);
   state.settings = { ...DEFAULT_SETTINGS, ...(settings || {}) };
+  aplicarTema(state.settings.tema);
   state.plan = plan || defaultPlan();
   state.startingWeights = sw || {};
   state.sessions = (sessions || []).sort((a, b) => (a.fecha + a.inicio < b.fecha + b.inicio ? -1 : 1));
@@ -84,6 +95,7 @@ export function toast(msg, ms = 2500) {
 export const actions = {
   async saveSettings(patch) {
     state.settings = { ...state.settings, ...patch };
+    if ('tema' in patch) aplicarTema(state.settings.tema);
     await db.put('kv', 'settings', state.settings); emit();
   },
 

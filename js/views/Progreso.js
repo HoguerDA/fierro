@@ -1,5 +1,5 @@
 import { html, useState, useEffect, useRef } from '../vendor/preact-htm.js';
-import { useStore, actions, toast } from '../state.js';
+import { useStore, actions, toast, state } from '../state.js';
 import { Card, Stat, Badge, Segment, PhotoImg, Empty, Btn, Confirm, OjoFotos } from './ui.js';
 import { todayKey, addDays, daysBetween, fmtDate, n0, n1, toUnit, parseKey } from '../util.js';
 import { MIN_SERIES, SESSIONS, SEQUENCE } from '../data/routine.js';
@@ -75,7 +75,8 @@ function WeightChart({ weighins }) {
     const x = (d) => pad.l + (daysBetween(start, d) / 59) * (W - pad.l - pad.r);
     const y = (kg) => pad.t + (1 - (kg - lo) / (hi - lo)) * (H - pad.t - pad.b);
     g.clearRect(0, 0, W, H);
-    g.strokeStyle = 'rgba(255,255,255,.08)'; g.fillStyle = 'rgba(255,255,255,.5)'; g.font = '11px system-ui'; g.textAlign = 'right';
+    const css = getComputedStyle(document.documentElement);
+    g.strokeStyle = css.getPropertyValue('--graf-linea'); g.fillStyle = css.getPropertyValue('--graf-texto'); g.font = '11px system-ui'; g.textAlign = 'right';
     for (let k = lo; k <= hi; k += (hi - lo > 8 ? 2 : 1)) { g.beginPath(); g.moveTo(pad.l, y(k)); g.lineTo(W - pad.r, y(k)); g.stroke(); g.fillText(String(k), pad.l - 6, y(k) + 4); }
     g.textAlign = 'center';
     for (let i = 0; i < 60; i += 15) { const d = addDays(start, i); g.fillText(fmtDate(d, false), x(d), H - 6); }
@@ -83,7 +84,7 @@ function WeightChart({ weighins }) {
     for (const p of pts) { g.beginPath(); g.arc(x(p.fecha), y(p.kg), 3, 0, Math.PI * 2); g.fill(); }
     g.strokeStyle = '#ff7a1a'; g.lineWidth = 2.5; g.beginPath();
     avg.forEach((a, i) => { i ? g.lineTo(x(a.d), y(a.kg)) : g.moveTo(x(a.d), y(a.kg)); }); g.stroke();
-  }, [weighins]);
+  }, [weighins, state.settings.tema]);
   return html`<canvas ref=${ref} class="chart"></canvas>`;
 }
 

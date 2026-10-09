@@ -29,6 +29,10 @@ export function Ajustes() {
       <div class="field"><label>Peso meta (opcional)</label><${Num} value=${st.metaPeso || null} onChange=${(v) => save({ metaPeso: v })} suffix="kg" /></div>
     </${Card}>
 
+    <${Card} title="Apariencia">
+      <div class="field"><label>Vista</label><${Segment} options=${[['oscuro', 'Oscura'], ['claro', 'Clara']]} value=${st.tema || 'oscuro'} onChange=${(t) => save({ tema: t })} /></div>
+    </${Card}>
+
     <${Card} title="Cargas del gym">
       <div class="field"><label>Unidad de las pesas</label><${Segment} options=${[['kg', 'kg'], ['lb', 'lb']]} value=${unit} onChange=${(u) => save({ unidad: u })} /></div>
       <div class="muted small">El peso corporal siempre va en kg. Esto solo cambia cómo capturas las pesas del gym; por dentro todo se guarda en kg.</div>
