@@ -1,5 +1,5 @@
 // HOD GYM service worker. Sube VERSION en cada despliegue (deploy.py lo hace solo).
-const VERSION = '0.1.8';
+const VERSION = '0.1.9';
 const CACHE = 'fierro-' + VERSION;
 const SHELL = [
   './', './index.html', './styles.css', './manifest.webmanifest',
@@ -13,7 +13,7 @@ const SHELL = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL.map((u) => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (e) => {

@@ -60,6 +60,10 @@ if ('serviceWorker' in navigator) {
           if (nw.state === 'installed' && navigator.serviceWorker.controller) { state.updateReady = true; navigate(state.route); }
         });
       });
+      // La app instalada casi nunca se recarga: buscar versión nueva al volver a ella y cada 30 min
+      const buscar = () => reg.update().catch(() => {});
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') buscar(); });
+      setInterval(buscar, 30 * 60 * 1000);
     } catch (e) { console.warn('SW', e); }
   });
 }
