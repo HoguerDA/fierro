@@ -151,3 +151,7 @@ table.tbl.small { font-size: 13px; }
 .onboard .btn { margin-top: 10px; }
 
 @media (min-width: 480px) { .grid2 .big { font-size: 40px; } }
+
+/* Respaldo en la nube */
+.good { color: var(--ok); font-weight: 600; }
+.bad { color: var(--bad); font-weight: 600; }

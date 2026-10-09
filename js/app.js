@@ -1,5 +1,6 @@
 import { html, render, useEffect } from './vendor/preact-htm.js';
-import { state, useStore, load, navigate } from './state.js';
+import { state, useStore, load, navigate, toast } from './state.js';
+import * as nube from './nube.js';
 import { Hoy } from './views/Hoy.js';
 import { Entrenar } from './views/Entrenar.js';
 import { Dieta } from './views/Dieta.js';
@@ -19,7 +20,7 @@ function App() {
   }, []);
 
   if (!s.loaded) return html`<div class="splash"><div class="logo">F</div></div>`;
-  if (!s.settings.onboarded) return html`<${Onboarding} />`;
+  if (!s.settings.onboarded) return html`<${Onboarding} />${s.toast ? html`<div class="toast">${s.toast}</div>` : null}`;
   const View = ROUTES[s.route] || Hoy;
   return html`
     <main>${html`<${View} />`}</main>
@@ -29,7 +30,25 @@ function App() {
   `;
 }
 
-load().then(() => render(html`<${App} />`, document.getElementById('app')));
+// Liga de vinculación: #vincular=<clave>&url=<worker>. Se lee y se borra de la barra antes de todo.
+const vinculo = (() => {
+  if (!location.hash.startsWith('#vincular=')) return null;
+  const p = new URLSearchParams(location.hash.slice(1));
+  history.replaceState(null, '', location.pathname + location.search);
+  return { clave: p.get('vincular'), url: p.get('url') };
+})();
+
+load().then(async () => {
+  nube.iniciar();
+  render(html`<${App} />`, document.getElementById('app'));
+  if (vinculo) {
+    toast('Conectando con la nube…', 10000);
+    try {
+      const r = await nube.vincular(vinculo.clave, vinculo.url);
+      toast(r === 'restaurado' ? 'Listo: tus datos se recuperaron de la nube' : 'Listo: respaldo en la nube activado', 4000);
+    } catch (e) { toast(e.message, 5000); }
+  }
+});
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {

@@ -1,10 +1,10 @@
 // Fierro service worker. Sube VERSION en cada despliegue (deploy.py lo hace solo).
-const VERSION = '0.1.1';
+const VERSION = '0.1.2';
 const CACHE = 'fierro-' + VERSION;
 const SHELL = [
   './', './index.html', './styles.css', './manifest.webmanifest',
   './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png',
-  './js/app.js', './js/state.js', './js/db.js', './js/util.js', './js/version.js',
+  './js/app.js', './js/state.js', './js/db.js', './js/nube.js', './js/util.js', './js/version.js',
   './js/vendor/preact-htm.js',
   './js/data/routine.js', './js/data/diet.js',
   './js/engine/nutrition.js', './js/engine/progression.js',

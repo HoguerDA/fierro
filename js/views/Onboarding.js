@@ -22,6 +22,6 @@ export function Onboarding() {
     <div class="field"><label>Peso meta (opcional)</label><${Num} value=${d.metaPeso} onChange=${(v) => setD({ ...d, metaPeso: v })} suffix="kg" placeholder="78" /></div>
     <div class="field"><label>Las pesas del gym las cuento en</label><${Segment} options=${[['kg', 'kg'], ['lb', 'lb']]} value=${d.unidad} onChange=${(u) => setD({ ...d, unidad: u })} /></div>
     <${Btn} onClick=${go} disabled=${!ok}>Empezar</${Btn}>
-    <p class="muted small">Todo se guarda en tu teléfono. Nada sale de aquí.</p>
+    <p class="muted small">Todo se guarda en tu teléfono. ¿Ya tenías Fierro? Abre tu liga de vinculación y tus datos regresan solos.</p>
   </div>`;
 }

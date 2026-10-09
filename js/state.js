@@ -1,4 +1,4 @@
-import { useState, useEffect } from './vendor/preact-htm.js';
+import { useState, useLayoutEffect } from './vendor/preact-htm.js';
 import { db, STORES } from './db.js';
 import { todayKey, shrinkImage, download, uid } from './util.js';
 import { SESSIONS, SEQUENCE } from './data/routine.js';
@@ -34,10 +34,23 @@ export const state = {
 
 const listeners = new Set();
 function emit() { for (const l of listeners) l(); }
+export const refresh = emit;
+
+// Todo menos las fotos, en el formato del respaldo.
+export async function snapshot() {
+  const data = { app: 'fierro', version: 1, exportado: new Date().toISOString() };
+  for (const s of STORES) {
+    if (s === 'photos') continue;
+    const keys = await db.keys(s), vals = await db.all(s);
+    data[s] = keys.map((k, i) => [k, vals[i]]);
+  }
+  return data;
+}
 
 export function useStore() {
   const [, set] = useState(0);
-  useEffect(() => { const f = () => set((x) => x + 1); listeners.add(f); return () => listeners.delete(f); }, []);
+  // useLayoutEffect: se suscribe en el mismo render, así no se pierde un aviso que llegue justo después de montar.
+  useLayoutEffect(() => { const f = () => set((x) => x + 1); listeners.add(f); return () => listeners.delete(f); }, []);
   return state;
 }
 
@@ -55,6 +68,7 @@ export async function load() {
   state.photoDates = (photoKeys || []).sort();
   state.active = active || null;
   state.loaded = true;
+  if (!state.nube) state.nube = { estado: 'off' };
   emit();
 }
 
@@ -168,13 +182,7 @@ export const actions = {
 
   // ---- Datos ----
   async exportJSON() {
-    const data = { app: 'fierro', version: 1, exportado: new Date().toISOString() };
-    for (const s of STORES) {
-      if (s === 'photos') continue;
-      const keys = await db.keys(s), vals = await db.all(s);
-      data[s] = keys.map((k, i) => [k, vals[i]]);
-    }
-    download(`fierro-${todayKey()}.json`, JSON.stringify(data, null, 1));
+    download(`fierro-${todayKey()}.json`, JSON.stringify(await snapshot(), null, 1));
   },
   async importJSON(text) {
     const data = JSON.parse(text);

@@ -29,11 +29,15 @@ function tx(store, mode, fn) {
   }));
 }
 
+// Aviso de cambios para el respaldo en la nube: (store, key, 'put' | 'del' | 'clear').
+export const hooks = { onWrite: null, mudo: false };
+function avisa(s, k, op) { return (r) => { if (hooks.onWrite && !hooks.mudo) hooks.onWrite(s, k, op); return r; }; }
+
 export const db = {
   get: (s, k) => tx(s, 'readonly', (o) => o.get(k)),
-  put: (s, k, v) => tx(s, 'readwrite', (o) => o.put(v, k)),
-  del: (s, k) => tx(s, 'readwrite', (o) => o.delete(k)),
+  put: (s, k, v) => tx(s, 'readwrite', (o) => o.put(v, k)).then(avisa(s, k, 'put')),
+  del: (s, k) => tx(s, 'readwrite', (o) => o.delete(k)).then(avisa(s, k, 'del')),
   all: (s) => tx(s, 'readonly', (o) => o.getAll()),
   keys: (s) => tx(s, 'readonly', (o) => o.getAllKeys()),
-  clear: (s) => tx(s, 'readwrite', (o) => o.clear()),
+  clear: (s) => tx(s, 'readwrite', (o) => o.clear()).then(avisa(s, null, 'clear')),
 };
