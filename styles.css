@@ -39,6 +39,7 @@ main { padding-bottom: calc(var(--nav) + env(safe-area-inset-bottom) + 16px); }
 .ok { color: var(--ok); } .warn { color: var(--warn); }
 .row { display: flex; align-items: center; gap: 8px; } .between { justify-content: space-between; } .gap { gap: 10px; }
 .row.gap > .btn { flex: 1; }
+.col { display: flex; flex-direction: column; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .big { font-size: 34px; font-weight: 800; line-height: 1.1; } .big .unit { font-size: 16px; font-weight: 500; color: var(--muted); }
 .big2 { font-size: 20px; font-weight: 700; }

@@ -3,7 +3,7 @@ import { db, STORES } from './db.js';
 import { todayKey, shrinkImage, download, uid } from './util.js';
 import { SESSIONS, SEQUENCE } from './data/routine.js';
 import { defaultPlan, buildSession, advancePlan, substitute as subst } from './engine/progression.js';
-import { revisarDieta } from './engine/ajuste.js';
+import { revisarDieta, responderRevision } from './engine/ajuste.js';
 
 export const DEFAULT_SETTINGS = {
   nombre: '',
@@ -106,6 +106,11 @@ export function toast(msg, ms = 2500) {
 }
 
 export const actions = {
+  async responderRevision(siguio) {
+    const r = responderRevision(state.settings.dietaAuto, siguio, todayKey());
+    await actions.saveSettings({ dietaAuto: r.auto });
+    toast(r.aviso, 6000);
+  },
   async saveSettings(patch) {
     state.settings = { ...state.settings, ...patch };
     if ('tema' in patch) aplicarTema(state.settings.tema);

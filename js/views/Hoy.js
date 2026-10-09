@@ -55,6 +55,16 @@ export function Hoy() {
       <div class="row between"><div><div class="muted">Sesión en curso</div><strong>${s.active.nombre}</strong></div><${Btn} small>Continuar</${Btn}></div>
     </${Card}>` : null}
 
+    ${s.settings.dietaAuto && s.settings.dietaAuto.pregunta ? html`<${Card} title="Revisión de 2 semanas" class="accent">
+      <p>Tu promedio de peso ${s.settings.dietaAuto.pregunta.bajada > 0.05 ? `bajó ${n1(s.settings.dietaAuto.pregunta.bajada)} kg` : 'no bajó'} en 2 semanas. La meta es 0.4 kg o más.</p>
+      <p><b>¿Cómo seguiste la dieta?</b></p>
+      <div class="col gap">
+        <${Btn} onClick=${() => actions.responderRevision(true)}>Bien, casi todo como dice el plan</${Btn}>
+        <${Btn} kind="ghost" onClick=${() => actions.responderRevision(false)}>Más o menos, la rompí varias veces</${Btn}>
+      </div>
+      <div class="muted small">Si la seguiste, se quitan 150 kcal. Si no, el plan se queda igual.</div>
+    </${Card}>` : null}
+
     <div class="grid2">
       <${Card} title="Peso de hoy">
         ${w && !editW ? html`

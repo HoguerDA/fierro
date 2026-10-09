@@ -157,7 +157,7 @@ export const RULES = [
   'Lo que importa es el promedio de la semana, no el día. Un día malo no rompe nada; una semana mala sí.',
   'Agua: 3 litros al día mínimo. Café sin azúcar, el que quieras hasta las 2 pm.',
   'Pésate todos los días al despertar, después del baño y antes de comer. La app saca el promedio.',
-  'Cada 2 semanas la app revisa tu promedio de peso. Si no bajó 0.4 kg o más, quita 150 kcal de carbohidrato sola y te avisa; las porciones del plan ya salen ajustadas.',
+  'Cada 2 semanas la app revisa tu promedio de peso. Si no bajó 0.4 kg o más, te pregunta si seguiste la dieta: si sí, quita 150 kcal de carbohidrato y las porciones salen ajustadas; si la rompiste, el plan no cambia.',
   'Cada 9 semanas la app pone sola una semana de descanso de dieta: comes a mantenimiento, con más carbohidrato en las mismas comidas. Luego regresa al plan normal.',
 ];
 
