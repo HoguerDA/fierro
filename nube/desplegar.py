@@ -1,9 +1,9 @@
-"""Despliega el respaldo en la nube de Fierro: bucket R2 + Worker fierro-api.
+"""Despliega el respaldo en la nube de HOD GYM: bucket R2 + Worker hod-gym-api.
 
 Uso:  python nube/desplegar.py
 
-Lee el token de Cloudflare de ~/.config/fierro/cf_token (o de la variable CF_TOKEN)
-y la clave de la app de ~/.config/fierro/clave.txt (si no existe, la crea).
+Lee el token de Cloudflare de ~/.config/hod-gym/cf_token (o de la variable CF_TOKEN)
+y la clave de la app de ~/.config/hod-gym/clave.txt (si no existe, la crea).
 Nada de eso vive en el repo, que es público.
 """
 import json
@@ -16,10 +16,10 @@ import uuid
 from pathlib import Path
 
 CUENTA = "0396e4697227062d2156d1a94117ee7a"
-BUCKET = "fierro-datos"
-WORKER = "fierro-api"
+BUCKET = "hod-gym"
+WORKER = "hod-gym-api"
 API = "https://api.cloudflare.com/client/v4"
-CONF = Path.home() / ".config" / "fierro"
+CONF = Path.home() / ".config" / "hod-gym"
 AQUI = Path(__file__).resolve().parent
 
 

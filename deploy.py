@@ -1,4 +1,4 @@
-"""Despliegue de Fierro: sube la versión, hace commit y push a main (GitHub Pages).
+"""Despliegue de HOD GYM: sube la versión, hace commit y push a main (GitHub Pages).
 
 Uso:  python deploy.py "mensaje del commit"
 """

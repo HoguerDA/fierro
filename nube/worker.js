@@ -1,5 +1,6 @@
-// Fierro · respaldo en la nube (Cloudflare Worker + R2).
-// Guarda los datos de la app y las fotos de progreso en el bucket privado fierro-datos.
+// HOD GYM · respaldo en la nube (Cloudflare Worker + R2).
+// Guarda los datos de la app y las fotos de progreso en el bucket privado hod-gym.
+// Los respaldos llevan app:'fierro', el nombre interno original de la app.
 // Solo responde a quien trae la clave (secreto CLAVE del Worker).
 //
 //   GET    /ping            comprueba la clave
@@ -93,7 +94,7 @@ export default {
           const texto = new TextDecoder().decode(buf);
           let d;
           try { d = JSON.parse(texto); } catch (_) { return json({ error: 'JSON inválido' }, 400, cors); }
-          if (!d || d.app !== 'fierro') return json({ error: 'No es un respaldo de Fierro' }, 400, cors);
+          if (!d || d.app !== 'fierro') return json({ error: 'No es un respaldo de HOD GYM' }, 400, cors);
 
           if (url.searchParams.get('forzar') !== '1') {
             const prev = await env.BUCKET.get('datos/actual.json');

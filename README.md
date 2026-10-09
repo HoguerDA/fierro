@@ -1,4 +1,4 @@
-# Fierro
+# HOD GYM
 
 App personal de gym y dieta. PWA sin build: HTML, CSS y módulos ES con Preact + htm
 empaquetados en `js/vendor/`. Todos los datos viven en el teléfono (IndexedDB);

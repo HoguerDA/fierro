@@ -66,7 +66,7 @@ export function Ajustes() {
       <${Btn} kind="danger" small onClick=${() => setConfirm('todo')}>Borrar todo</${Btn}>
     </${Card}>
 
-    <div class="muted small center">Fierro ${APP_VERSION}${s.updateReady ? html` · <a href="#" onClick=${(e) => { e.preventDefault(); location.reload(); }}>Hay versión nueva, toca para actualizar</a>` : ''}</div>
+    <div class="muted small center">HOD GYM ${APP_VERSION}${s.updateReady ? html` · <a href="#" onClick=${(e) => { e.preventDefault(); location.reload(); }}>Hay versión nueva, toca para actualizar</a>` : ''}</div>
 
     <${Confirm} open=${confirm === 'plan'} text="Vuelves al bloque 1, semana 1, Superior A. El historial de sesiones se conserva." onYes=${() => { actions.resetPlan(); setConfirm(null); toast('Plan reiniciado'); }} onNo=${() => setConfirm(null)} yes="Reiniciar" />
     <${Confirm} open=${confirm === 'todo'} text=${s.nube && s.nube.estado !== 'off' ? 'Se borra todo lo de este teléfono y se desvincula de la nube. La copia de la nube se queda; con tu liga la recuperas.' : 'Se borra TODO: pesajes, fotos, sesiones y ajustes. No hay vuelta atrás. ¿Seguro?'} onYes=${async () => { nube.desvincular(); await actions.resetAll(); setConfirm(null); navigate('hoy'); }} onNo=${() => setConfirm(null)} yes="Borrar todo" />

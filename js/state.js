@@ -182,11 +182,11 @@ export const actions = {
 
   // ---- Datos ----
   async exportJSON() {
-    download(`fierro-${todayKey()}.json`, JSON.stringify(await snapshot(), null, 1));
+    download(`hod-gym-${todayKey()}.json`, JSON.stringify(await snapshot(), null, 1));
   },
   async importJSON(text) {
     const data = JSON.parse(text);
-    if (data.app !== 'fierro') throw new Error('Ese archivo no es un respaldo de Fierro');
+    if (data.app !== 'fierro') throw new Error('Ese archivo no es un respaldo de HOD GYM');
     for (const s of STORES) {
       if (!data[s]) continue;
       for (const [k, v] of data[s]) await db.put(s, k, v);
