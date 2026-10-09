@@ -68,7 +68,8 @@ export function Hoy() {
 
       <${Card} title="Foto de hoy">
         ${hasPhoto ? html`<${PhotoImg} getter=${actions.getPhoto} fecha=${today} class="thumb" onClick=${() => navigate('progreso')} />` : html`<div class="photo-ph thumb"><span>Sin foto</span></div>`}
-        <label class="btn btn-${hasPhoto ? 'ghost' : 'primary'} btn-sm file-btn">${hasPhoto ? 'Repetir' : 'Tomar foto'}<input type="file" accept="image/*" onChange=${onPhoto} /></label>
+        <label class="btn btn-${hasPhoto ? 'ghost' : 'primary'} btn-sm file-btn">${hasPhoto ? 'Repetir' : 'Tomar foto'}<input type="file" accept="image/*" capture="environment" onChange=${onPhoto} /></label>
+        <label class="btn btn-ghost btn-sm file-btn">De la galería<input type="file" accept="image/*" onChange=${onPhoto} /></label>
       </${Card}>
     </div>
 
