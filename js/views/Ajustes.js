@@ -36,14 +36,6 @@ export function Ajustes() {
       <div class="muted small">El peso corporal siempre va en kg. Esto solo cambia cómo capturas las pesas del gym; por dentro todo se guarda en kg.</div>
     </${Card}>
 
-    <${Card} title="Dieta: parámetros">
-      <div class="field"><label>Factor de actividad</label><${Num} value=${st.factor} onChange=${(v) => save({ factor: v || 1.55 })} step=${0.05} /></div>
-      <div class="field"><label>Déficit (0.20 = 20 %)</label><${Num} value=${st.deficit} onChange=${(v) => save({ deficit: v == null ? 0.2 : v })} step=${0.05} /></div>
-      <div class="field"><label>Proteína g/kg</label><${Num} value=${st.proteinaGkg} onChange=${(v) => save({ proteinaGkg: v || 2 })} step=${0.1} /></div>
-      <div class="field"><label>Grasa g/kg</label><${Num} value=${st.grasaGkg} onChange=${(v) => save({ grasaGkg: v || 0.8 })} step=${0.1} /></div>
-      <div class="muted small">Déficit 0 = semana de mantenimiento. Pon 0 cada 8 a 10 semanas, una semana, y regresa a 0.20.</div>
-    </${Card}>
-
     <${Card} title="Plan de entrenamiento">
       <div class="muted small">Bloque ${s.plan.blockNumber}, ${s.plan.blockSessions} sesiones hechas en este bloque de 20.</div>
       <${Btn} kind="ghost" small onClick=${() => setConfirm('plan')}>Reiniciar bloque y secuencia</${Btn}>

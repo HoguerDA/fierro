@@ -2,7 +2,8 @@ import { html, useState } from '../vendor/preact-htm.js';
 import { useStore, actions, toast } from '../state.js';
 import { Card, Btn, Segment, Badge, Sheet } from './ui.js';
 import { n0, n1, todayKey, addDays, fmtDate } from '../util.js';
-import { PLANS, SWAPS, RULES, macros, FOODS } from '../data/diet.js';
+import { planDelDia, SWAPS, RULES, macros, FOODS } from '../data/diet.js';
+import { proximaRevision, proximoDescanso, finDescanso } from '../engine/ajuste.js';
 import { targets, dayTargets } from '../engine/nutrition.js';
 import { avg7 } from './Progreso.js';
 
@@ -14,7 +15,8 @@ export function Dieta() {
   const [nota, setNota] = useState('');
   const peso = avg7(s.weighins) || (s.weighins.length ? s.weighins[s.weighins.length - 1].kg : null);
   const base = targets(s.settings, peso);
-  const plan = PLANS[tipo];
+  const plan = planDelDia(tipo, base.ajustePlan);
+  const auto = s.settings.dietaAuto;
   const tg = dayTargets(base, plan.ajusteKcal);
   const tot = macros(plan.comidas.flatMap((c) => c.items));
 
@@ -30,6 +32,8 @@ export function Dieta() {
     ${tab === 'plan' ? html`
       <${Segment} options=${[['entreno', 'Día de entreno'], ['descanso', 'Día de descanso']]} value=${tipo} onChange=${setTipo} />
       <p class="muted small">${plan.descripcion}</p>
+      ${base.descanso ? html`<div class="banner ok">Semana de descanso de dieta hasta el ${fmtDate(finDescanso(auto))}. Comes a mantenimiento: el carbohidrato ya viene aumentado.</div>`
+        : base.recorte ? html`<div class="banner info">Ajuste automático: −${base.recorte} kcal porque la báscula iba lenta. El carbohidrato ya viene ajustado.</div>` : null}
       ${plan.comidas.map((c) => { const m = macros(c.items); return html`<${Card} title=${`${c.nombre} · ${c.hora}`} right=${html`<span class="muted small">${n0(m.kcal)} kcal</span>`}>
         <ul class="food">${c.items.map((x) => html`<li><div><span>${x.alimento}</span>${x.nota ? html`<div class="muted small">${x.nota}</div>` : null}</div><b>${x.gramos} g</b></li>`)}</ul>
         <div class="muted small">P ${n0(m.p)} · C ${n0(m.c)} · G ${n0(m.f)}</div>
@@ -59,13 +63,16 @@ export function Dieta() {
         <tr><td>Edad</td><td>${base.edad}</td></tr>
         <tr><td>Metabolismo basal (Mifflin-St Jeor)</td><td>${n0(base.bmr)} kcal</td></tr>
         <tr><td>Mantenimiento (× ${s.settings.factor})</td><td>${n0(base.mant)} kcal</td></tr>
-        <tr><td>Objetivo (déficit ${Math.round((s.settings.deficit) * 100)} %)</td><td>${n0(base.kcal)} kcal</td></tr>
+        ${base.descanso ? html`<tr><td>Objetivo (semana de descanso: mantenimiento)</td><td>${n0(base.kcal)} kcal</td></tr>`
+          : html`<tr><td>Objetivo (déficit ${Math.round(base.deficit * 100)} %${base.recorte ? `, −${base.recorte} de ajuste` : ''})</td><td>${n0(base.kcal)} kcal</td></tr>`}
         <tr><td>Proteína (${s.settings.proteinaGkg} g/kg)</td><td>${n0(base.p)} g</td></tr>
         <tr><td>Grasa (${s.settings.grasaGkg} g/kg)</td><td>${n0(base.f)} g</td></tr>
         <tr><td>Carbohidrato (lo que queda)</td><td>${n0(base.c)} g</td></tr>
         <tr><td>Pérdida esperada</td><td>${n1(base.perdidaSemana)} kg/semana</td></tr>
+        ${auto ? html`<tr><td>Próxima revisión de peso</td><td>${fmtDate(proximaRevision(auto))}</td></tr>
+        <tr><td>${auto.descanso ? 'Fin de la semana de descanso' : 'Próxima semana de descanso'}</td><td>${fmtDate(auto.descanso ? finDescanso(auto) : proximoDescanso(auto))}</td></tr>` : null}
       </tbody></table>
-      <div class="muted small">Día de entreno: +100 kcal de carbohidrato. Día de descanso: −100. Cambia los parámetros en Ajustes.</div>
+      <div class="muted small">Día de entreno: +100 kcal de carbohidrato. Día de descanso: −100. Todo esto se ajusta solo: no tienes que mover nada.</div>
       <h3>Tabla de alimentos (por 100 g)</h3>
       <table class="tbl small"><thead><tr><th>Alimento</th><th>kcal</th><th>P</th><th>C</th><th>G</th></tr></thead><tbody>
         ${Object.entries(FOODS).map(([k, v]) => html`<tr><td>${k}</td><td>${v[0]}</td><td>${v[1]}</td><td>${v[2]}</td><td>${v[3]}</td></tr>`)}

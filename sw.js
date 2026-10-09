@@ -1,5 +1,5 @@
 // HOD GYM service worker. Sube VERSION en cada despliegue (deploy.py lo hace solo).
-const VERSION = '0.1.9';
+const VERSION = '0.1.10';
 const CACHE = 'fierro-' + VERSION;
 const SHELL = [
   './', './index.html', './styles.css', './manifest.webmanifest',
@@ -7,7 +7,7 @@ const SHELL = [
   './js/app.js', './js/state.js', './js/db.js', './js/nube.js', './js/util.js', './js/version.js',
   './js/vendor/preact-htm.js',
   './js/data/routine.js', './js/data/diet.js',
-  './js/engine/nutrition.js', './js/engine/progression.js',
+  './js/engine/nutrition.js', './js/engine/progression.js', './js/engine/ajuste.js',
   './js/views/ui.js', './js/views/Hoy.js', './js/views/Entrenar.js', './js/views/Dieta.js',
   './js/views/Progreso.js', './js/views/Ajustes.js', './js/views/Onboarding.js',
 ];

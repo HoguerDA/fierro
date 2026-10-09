@@ -31,6 +31,53 @@ export const FOODS = {
 
 const it = (alimento, gramos, nota = '') => ({ alimento, gramos, nota });
 
+// Carbohidratos que se mueven con el ajuste automático. paso = gramos de una pieza;
+// unidad = cómo se cuenta; papa = gramos de papa por gramo del alimento, para la alternativa.
+const AJUSTABLES = {
+  'Arroz cocido': { paso: 10, min: 60, papa: 1.2 },
+  'Pan integral': { paso: 40, min: 40, unidad: ['rebanada', 'rebanadas'] },
+  'Tortilla de maíz': { paso: 30, min: 30, unidad: ['tortilla', 'tortillas'], papa: 2.5 },
+  'Salmas': { paso: 6.25, min: 12.5, unidad: ['pieza', 'piezas'] },
+};
+
+const redondea = (g, paso) => Math.round(g / paso) * paso;
+
+function notaAjustada(x, cfg) {
+  const partes = [];
+  if (cfg.unidad) { const n = Math.round(x.gramos / cfg.paso); partes.push(`${n} ${cfg.unidad[n === 1 ? 0 : 1]}`); }
+  if (cfg.papa) partes.push(`${cfg.unidad ? 'o' : 'O'} ${redondea(x.gramos * cfg.papa, 10)} g de papa`);
+  return partes.join(', ');
+}
+
+// El plan del día con las porciones de carbohidrato movidas `delta` kcal (negativo = menos comida).
+// Escala todos los ajustables por igual, en piezas enteras, y el arroz absorbe lo que falte.
+export function planDelDia(tipo, delta = 0) {
+  const base = PLANS[tipo];
+  if (!delta || Math.abs(delta) < 20) return base;
+  const plan = { ...base, comidas: base.comidas.map((c) => ({ ...c, items: c.items.map((x) => ({ ...x })) })) };
+  const items = plan.comidas.flatMap((c) => c.items).filter((x) => AJUSTABLES[x.alimento]);
+  const kcalDe = (x) => FOODS[x.alimento][0] * x.gramos / 100;
+  const total = items.reduce((a, x) => a + kcalDe(x), 0);
+  if (!total) return base;
+  const f = Math.max(0, 1 + delta / total);
+  for (const x of items) {
+    const cfg = AJUSTABLES[x.alimento];
+    if (x.alimento !== 'Arroz cocido') x.gramos = Math.max(cfg.min, redondea(x.gramos * f, cfg.paso));
+  }
+  const objetivo = total + delta;
+  const arroces = items.filter((x) => x.alimento === 'Arroz cocido');
+  const resto = items.filter((x) => x.alimento !== 'Arroz cocido').reduce((a, x) => a + kcalDe(x), 0);
+  const porArroz = Math.max(0, objetivo - resto) / arroces.length;
+  for (const x of arroces) x.gramos = Math.max(AJUSTABLES['Arroz cocido'].min, redondea(porArroz / FOODS['Arroz cocido'][0] * 100, 10));
+  for (const x of items) {
+    const orig = base.comidas.flatMap((c) => c.items).find((o) => o.alimento === x.alimento && o.nota === x.nota);
+    if (orig && orig.gramos === x.gramos) continue;
+    x.gramos = Math.round(x.gramos);
+    x.nota = notaAjustada(x, AJUSTABLES[x.alimento]);
+  }
+  return plan;
+}
+
 export const PLANS = {
   entreno: {
     nombre: 'Día de entreno',
@@ -110,8 +157,8 @@ export const RULES = [
   'Lo que importa es el promedio de la semana, no el día. Un día malo no rompe nada; una semana mala sí.',
   'Agua: 3 litros al día mínimo. Café sin azúcar, el que quieras hasta las 2 pm.',
   'Pésate todos los días al despertar, después del baño y antes de comer. La app saca el promedio.',
-  'Cada 2 semanas se revisa: si el promedio de peso no baja 0.4 kg o más, se quitan 150 kcal de carbohidrato.',
-  'Cada 8 a 10 semanas, una semana a mantenimiento: mismas comidas más 300 kcal de carbohidrato.',
+  'Cada 2 semanas la app revisa tu promedio de peso. Si no bajó 0.4 kg o más, quita 150 kcal de carbohidrato sola y te avisa; las porciones del plan ya salen ajustadas.',
+  'Cada 9 semanas la app pone sola una semana de descanso de dieta: comes a mantenimiento, con más carbohidrato en las mismas comidas. Luego regresa al plan normal.',
 ];
 
 // Macros de una lista de items [{alimento, gramos}] → {kcal, p, c, f}

@@ -3,7 +3,8 @@ import { useStore, actions, navigate, toast } from '../state.js';
 import { Card, Btn, Num, Stat, Badge, Sheet, Segment, PhotoImg, OjoFotos } from './ui.js';
 import { todayKey, fmtDate, n1, n0, addDays } from '../util.js';
 import { SEQUENCE, SESSIONS } from '../data/routine.js';
-import { PLANS, macros } from '../data/diet.js';
+import { planDelDia, macros } from '../data/diet.js';
+import { finDescanso } from '../engine/ajuste.js';
 import { targets, dayTargets } from '../engine/nutrition.js';
 import { currentWeek, isDeload, isReentry, nextSessionTemplate, lastSessionDate } from '../engine/progression.js';
 import { avg7, weightTrend } from './Progreso.js';
@@ -26,8 +27,8 @@ export function Hoy() {
   const thisWeek = s.sessions.filter((x) => x.estado === 'terminada' && x.fecha >= sinceMon).length;
 
   const meal = actions.mealDay(today);
-  const plan = PLANS[meal.tipo];
   const base = targets(s.settings, avg7(s.weighins) || (w && w.kg));
+  const plan = planDelDia(meal.tipo, base.ajustePlan);
   const tg = dayTargets(base, plan.ajusteKcal);
   const eaten = macros(plan.comidas.flatMap((c, i) => (meal.hechas[i] ? c.items : [])));
 
@@ -96,6 +97,7 @@ export function Hoy() {
       <div class="macro-bar"><div style=${`width:${Math.min(100, eaten.kcal / tg.kcal * 100)}%`}></div></div>
       <div class="row between small muted"><span>${n0(eaten.kcal)} / ${n0(tg.kcal)} kcal</span><span>P ${n0(eaten.p)}/${n0(tg.p)} · C ${n0(eaten.c)}/${n0(tg.c)} · G ${n0(eaten.f)}/${n0(tg.f)}</span></div>
       ${meal.libre ? html`<div class="banner info">Hoy fue tu comida libre. Registrada.</div>` : null}
+      ${base.descanso ? html`<div class="banner ok">Semana de descanso de dieta hasta el ${fmtDate(finDescanso(s.settings.dietaAuto))}: comes a mantenimiento, con más carbohidrato.</div>` : null}
       <${Btn} kind="ghost" small onClick=${() => navigate('dieta')}>Ver dieta completa</${Btn}>
     </${Card}>
 

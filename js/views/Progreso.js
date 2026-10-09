@@ -50,7 +50,7 @@ function Peso({ s }) {
       ${s.weighins.length >= 2 ? html`<${WeightChart} weighins=${s.weighins} />` : html`<${Empty}>Con dos pesajes empieza la gráfica. Los puntos son cada día; la línea, el promedio de 7 días. Mira la línea, no los puntos.</${Empty}>`}
       <div class="muted small">${rate != null ? `Ritmo de las últimas 2 semanas: ${rate > 0 ? '+' : ''}${n1(rate)} kg por semana. Meta: entre −0.4 y −0.7.` : 'Con 3 semanas de pesajes te digo el ritmo real.'}
       ${weeksToGoal ? ` A este paso llegas a ${meta} kg en unas ${Math.round(weeksToGoal)} semanas.` : ''}</div>
-      ${rate != null && rate > -0.3 && s.weighins.length > 14 ? html`<div class="banner warn">La báscula va lento. Si el promedio sigue así otra semana, se quitan 150 kcal de carbohidrato (ajuste en Dieta).</div>` : null}
+      ${rate != null && rate > -0.3 && s.weighins.length > 14 ? html`<div class="banner warn">La báscula va lento. Si sigue así, en la próxima revisión la app quita 150 kcal de carbohidrato sola.</div>` : null}
     </${Card}>
     <${Card} title="Pesajes">
       ${s.weighins.length ? html`<div class="wlist">${s.weighins.slice().reverse().slice(0, 30).map((w) => html`<div class="row between" onClick=${() => setDel(w.fecha)}><span>${fmtDate(w.fecha)}</span><b>${n1(w.kg)} kg</b></div>`)}</div>` : html`<${Empty}>Todavía no hay pesajes.</${Empty}>`}

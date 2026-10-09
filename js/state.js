@@ -3,6 +3,7 @@ import { db, STORES } from './db.js';
 import { todayKey, shrinkImage, download, uid } from './util.js';
 import { SESSIONS, SEQUENCE } from './data/routine.js';
 import { defaultPlan, buildSession, advancePlan, substitute as subst } from './engine/progression.js';
+import { revisarDieta } from './engine/ajuste.js';
 
 export const DEFAULT_SETTINGS = {
   nombre: '',
@@ -16,6 +17,7 @@ export const DEFAULT_SETTINGS = {
   grasaGkg: 0.8,
   fotosBorrosas: false, // fotos de progreso desenfocadas (botón del ojo)
   tema: 'oscuro',       // 'oscuro' | 'claro'
+  dietaAuto: null,      // ajuste automático de la dieta (engine/ajuste.js)
   onboarded: false,
 };
 
@@ -82,6 +84,17 @@ export async function load() {
   state.loaded = true;
   if (!state.nube) state.nube = { estado: 'off' };
   emit();
+  await ajustarDieta();
+}
+
+// Revisión automática de la dieta: al abrir la app y al guardar un pesaje.
+async function ajustarDieta() {
+  if (!state.settings.onboarded) return;
+  const r = revisarDieta(state.settings.dietaAuto, state.weighins, todayKey());
+  if (!r) return;
+  state.settings = { ...state.settings, dietaAuto: r.auto };
+  await db.put('kv', 'settings', state.settings); emit();
+  if (r.aviso) setTimeout(() => toast(r.aviso, 7000), 600);
 }
 
 export function navigate(route) { state.route = route; location.hash = route; emit(); window.scrollTo(0, 0); }
@@ -105,6 +118,7 @@ export const actions = {
     await db.put('weighins', fecha, w);
     state.weighins = [...state.weighins.filter((x) => x.fecha !== fecha), w].sort((a, b) => (a.fecha < b.fecha ? -1 : 1));
     emit();
+    await ajustarDieta();
   },
   async deleteWeighin(fecha) {
     await db.del('weighins', fecha);
