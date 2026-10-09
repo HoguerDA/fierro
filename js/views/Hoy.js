@@ -78,7 +78,7 @@ export function Hoy() {
         <div><div class="big2">${tpl.nombre}</div><div class="muted">${tpl.enfasis} · ${tpl.ejercicios.length} ejercicios</div></div>
       </div>
       ${reentry && last ? html`<div class="banner warn">Llevas más de 10 días sin entrenar (última: ${fmtDate(last)}). Hoy toca sesión de regreso: menos series, 85 % del peso, RIR 3.</div>` : null}
-      ${!last ? html`<div class="banner info">Primera sesión. Si ya cargaste tus pesos iniciales en Ajustes, los verás sugeridos; si no, elige el peso en cada ejercicio.</div>` : null}
+      ${!last ? html`<div class="banner info">Primera sesión: elige el peso en cada ejercicio. De ahí en adelante la app te sugiere cuánto cargar.</div>` : null}
       <div class="row gap">
         <${Btn} onClick=${() => { actions.startSession(); navigate('entrenar'); }} disabled=${!!s.active}>Empezar</${Btn}>
         <${Btn} kind="ghost" onClick=${() => setPick(true)} disabled=${!!s.active}>Otra sesión</${Btn}>

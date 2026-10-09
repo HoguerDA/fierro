@@ -1,8 +1,6 @@
 import { html, useState } from '../vendor/preact-htm.js';
 import { useStore, actions, toast, navigate } from '../state.js';
 import { Card, Btn, Num, Segment, Confirm } from './ui.js';
-import { toUnit, fromUnit, n1 } from '../util.js';
-import { SEQUENCE, SESSIONS } from '../data/routine.js';
 import { APP_VERSION } from '../version.js';
 import * as nube from '../nube.js';
 
@@ -36,14 +34,6 @@ export function Ajustes() {
     <${Card} title="Cargas del gym">
       <div class="field"><label>Unidad de las pesas</label><${Segment} options=${[['kg', 'kg'], ['lb', 'lb']]} value=${unit} onChange=${(u) => save({ unidad: u })} /></div>
       <div class="muted small">El peso corporal siempre va en kg. Esto solo cambia cómo capturas las pesas del gym; por dentro todo se guarda en kg.</div>
-    </${Card}>
-
-    <${Card} title="Pesos iniciales">
-      <p class="muted small">Lo que cargas hoy en cada ejercicio, en ${unit}. Es el punto de partida de la primera sesión; después la app lo lleva sola. Déjalo vacío si no lo sabes.</p>
-      ${SEQUENCE.map((id) => html`<h3>${SESSIONS[id].nombre}</h3>
-        ${SESSIONS[id].ejercicios.map((e) => html`<div class="field row between"><label>${e.nombre}</label>
-          <${Num} class="w90" value=${s.startingWeights[e.id] == null ? null : Math.round(toUnit(s.startingWeights[e.id], unit) * 100) / 100} onChange=${(v) => actions.setStartingWeight(e.id, v == null ? null : fromUnit(v, unit))} placeholder="—" />
-        </div>`)}`)}
     </${Card}>
 
     <${Card} title="Dieta: parámetros">

@@ -16,7 +16,7 @@ nada sale del dispositivo.
   el peso real (Mifflin-St Jeor), cambios equivalentes, reglas, comida libre semanal.
 - **Progreso**: gráfica de peso, 1RM estimado por ejercicio, series por músculo,
   sesiones por semana, fotos antes/ahora.
-- **Ajustes**: perfil, kg/lb, pesos iniciales, parámetros de la dieta, respaldo JSON.
+- **Ajustes**: perfil, vista, kg/lb, parámetros de la dieta, respaldo JSON.
 
 ## Correr en local
 
