@@ -1,6 +1,6 @@
 import { html, useState, useEffect, useRef } from '../vendor/preact-htm.js';
 import { useStore, actions, toast } from '../state.js';
-import { Card, Stat, Badge, Segment, PhotoImg, Empty, Btn, Confirm } from './ui.js';
+import { Card, Stat, Badge, Segment, PhotoImg, Empty, Btn, Confirm, OjoFotos } from './ui.js';
 import { todayKey, addDays, daysBetween, fmtDate, n0, n1, toUnit, parseKey } from '../util.js';
 import { MIN_SERIES, SESSIONS, SEQUENCE } from '../data/routine.js';
 import { weeklyVolume, history, bestE1rm } from '../engine/progression.js';
@@ -130,7 +130,7 @@ function Fotos({ s }) {
   const first = s.photoDates[0];
   const cmp = sel || dates[0];
   return html`
-    <${Card} title="Antes y ahora">
+    <${Card} title="Antes y ahora" right=${html`<${OjoFotos} />`}>
       <div class="compare">
         <div><${PhotoImg} getter=${actions.getPhoto} fecha=${first} /><div class="small muted">${fmtDate(first)}</div></div>
         <div><${PhotoImg} getter=${actions.getPhoto} fecha=${cmp} /><div class="small muted">${fmtDate(cmp)}</div></div>

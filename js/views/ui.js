@@ -1,4 +1,5 @@
 import { html, useState, useEffect, useRef } from '../vendor/preact-htm.js';
+import { state, actions } from '../state.js';
 
 export function Card({ title, right, children, class: cls = '', onClick }) {
   return html`<section class="card ${cls}" onClick=${onClick}>
@@ -62,7 +63,20 @@ export function PhotoImg({ getter, fecha, class: cls = '', onClick }) {
     getter(fecha).then((p) => { if (p && p.blob) { u = URL.createObjectURL(p.blob); setUrl(u); } });
     return () => { if (u) URL.revokeObjectURL(u); };
   }, [fecha]);
-  return url ? html`<img class=${cls} src=${url} alt="Foto ${fecha}" onClick=${onClick} />` : html`<div class="photo-ph ${cls}"></div>`;
+  const borrosa = state.settings.fotosBorrosas ? 'borrosa' : '';
+  return url ? html`<img class="${cls} ${borrosa}" src=${url} alt="Foto ${fecha}" onClick=${onClick} />` : html`<div class="photo-ph ${cls}"></div>`;
+}
+
+// Botón del ojo: desenfoca o muestra todas las fotos. Se queda como lo dejes.
+export function OjoFotos() {
+  const oculto = !!state.settings.fotosBorrosas;
+  return html`<button class="ojo" aria-label=${oculto ? 'Mostrar fotos' : 'Desenfocar fotos'} title=${oculto ? 'Mostrar fotos' : 'Desenfocar fotos'}
+    onClick=${(e) => { e.stopPropagation(); actions.saveSettings({ fotosBorrosas: !oculto }); }}>
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" />
+      ${oculto ? html`<line x1="3" y1="3" x2="21" y2="21" />` : null}
+    </svg>
+  </button>`;
 }
 
 export function useInterval(fn, ms, active = true) {

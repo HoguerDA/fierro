@@ -1,6 +1,6 @@
 import { html, useState } from '../vendor/preact-htm.js';
 import { useStore, actions, navigate, toast } from '../state.js';
-import { Card, Btn, Num, Stat, Badge, Sheet, Segment, PhotoImg } from './ui.js';
+import { Card, Btn, Num, Stat, Badge, Sheet, Segment, PhotoImg, OjoFotos } from './ui.js';
 import { todayKey, fmtDate, n1, n0, addDays } from '../util.js';
 import { SEQUENCE, SESSIONS } from '../data/routine.js';
 import { PLANS, macros } from '../data/diet.js';
@@ -66,7 +66,7 @@ export function Hoy() {
           <div class="muted small">Al despertar, después del baño, antes de comer.</div>`}
       </${Card}>
 
-      <${Card} title="Foto de hoy">
+      <${Card} title="Foto de hoy" right=${hasPhoto ? html`<${OjoFotos} />` : null}>
         ${hasPhoto ? html`<${PhotoImg} getter=${actions.getPhoto} fecha=${today} class="thumb" onClick=${() => navigate('progreso')} />` : html`<div class="photo-ph thumb"><span>Sin foto</span></div>`}
         <label class="btn btn-${hasPhoto ? 'ghost' : 'primary'} btn-sm file-btn">${hasPhoto ? 'Repetir' : 'Tomar foto'}<input type="file" accept="image/*" capture="environment" onChange=${onPhoto} /></label>
         <label class="btn btn-ghost btn-sm file-btn">De la galería<input type="file" accept="image/*" onChange=${onPhoto} /></label>

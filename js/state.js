@@ -14,6 +14,7 @@ export const DEFAULT_SETTINGS = {
   deficit: 0.20,
   proteinaGkg: 2.0,
   grasaGkg: 0.8,
+  fotosBorrosas: false, // fotos de progreso desenfocadas (botón del ojo)
   onboarded: false,
 };
 
